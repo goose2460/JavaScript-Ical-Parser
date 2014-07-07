@@ -6,7 +6,7 @@
  * @source: https://github.com/thybag/
  * @version: 0.2
  */
-function ical_parser(feed_url, callback){
+function ical_parser(rData, callback){
 	//store of unproccesed data.
 	this.raw_data = null;
 	//Store of proccessed data.
@@ -91,6 +91,7 @@ function ical_parser(feed_url, callback){
 				idx = ln.indexOf(':');
 				//Apply trimming to values to reduce risks of badly formatted ical files.
 				type = ln.substr(0,idx).replace(/^\s\s*/, '').replace(/\s\s*$/, '');//Trim
+				type = type.split(";")[0];//trim again (unneeded timezone info following ;)
 				val = ln.substr(idx+1,ln.length-(idx+1)).replace(/^\s\s*/, '').replace(/\s\s*$/, '');
 				
 				//If the type is a start date, proccess it and store details
@@ -165,20 +166,17 @@ function ical_parser(feed_url, callback){
 	 *
 	 * @param ical file url
 	 */
-	this.load = function(ical_file){
+	this.load = function(r){
 		var tmp_this = this;
 		this.raw_data = null;
-		this.loadFile(ical_file, function(data){
-			//if the file loads, store the data and invoke the parser
-			tmp_this.raw_data = data;
-			tmp_this.parseICAL(data);
-		});
+		tmp_this.raw_data = r;
+		tmp_this.parseICAL(r);
 	}
 	
 	//Store this so we can use it in the callback from the load function.
 	var tmp_this = this;
 	//Store the feed url
-	this.feed_url = feed_url;
+	this.rData = rData;
 	//Load the file
-	this.load(this.feed_url);
+	this.load(this.rData);
 }
